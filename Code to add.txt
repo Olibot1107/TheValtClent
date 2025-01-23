@@ -1,0 +1,44 @@
+package com.example.mymod;
+
+import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.client.rendering.v1.HudRenderCallback;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.util.math.MatrixStack;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.util.Identifier;
+
+public class MyMod implements ModInitializer {
+
+    @Override
+    public void onInitialize() {
+        // Register the HUD render callback
+        HudRenderCallback.EVENT.register(this::onHudRender);
+    }
+
+    private void onHudRender(MatrixStack matrixStack, float tickDelta) {
+        MinecraftClient client = MinecraftClient.getInstance();
+        PlayerEntity player = client.player;
+
+        if (player != null) {
+            int health = (int) player.getHealth();
+            int maxHealth = (int) player.getMaxHealth();
+
+            // Calculate the width of the health bar based on the player's health
+            int healthBarWidth = (int) (health / (float) maxHealth * 100);
+
+            // Draw the background of the health bar
+            client.textRenderer.draw(matrixStack, "Health", 10, 10, 0xFFFFFF);
+            client.getTextureManager().bindTexture(new Identifier("textures/gui/bars/health_bar_background.png"));
+            drawTexture(matrixStack, 10, 20, 0, 0, 100, 10);
+
+            // Draw the actual health bar
+            client.getTextureManager().bindTexture(new Identifier("textures/gui/bars/health_bar.png"));
+            drawTexture(matrixStack, 10, 20, 0, 0, healthBarWidth, 10);
+        }
+    }
+
+    private void drawTexture(MatrixStack matrixStack, int x, int y, int u, int v, int width, int height) {
+        // Method to draw the texture on the screen
+        MinecraftClient.getInstance().textRenderer.draw(matrixStack, "", x, y, 0xFFFFFF);
+    }
+}
